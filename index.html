@@ -93,7 +93,7 @@
       z-index: 9999;
     }
 
-    /* Heart pieces (CSS heart) */
+    /* CSS heart confetti */
     .confettiHeart{
       position: absolute;
       width: 14px;
@@ -116,15 +116,15 @@
     .confettiHeart::before{ top:-50%; left:0; }
     .confettiHeart::after{ left:-50%; top:0; }
 
-    /* Emoji pieces (💗 + 🍆) */
+    /* Emoji particles */
     .confettiEmoji{
       position: absolute;
-      font-size: 18px;
       line-height: 1;
       transform: translate(0,0);
       opacity: 1;
       animation: floatEmoji 950ms ease-out forwards;
       filter: drop-shadow(0 6px 10px rgba(0,0,0,0.12));
+      will-change: transform, opacity;
     }
 
     @keyframes flyUp{
@@ -202,6 +202,7 @@
       yes.textContent = "Yay 💞";
     });
 
+    // "No" dodges + STOPPP grows
     function dodgeNo(){
       makeStopLonger();
       const x = (Math.random() - 0.5) * 240;
@@ -217,10 +218,10 @@
         const h = document.createElement("div");
         h.className = "confettiHeart";
 
-        const dx = (Math.random() - 0.5) * 360;
-        const dy = -(120 + Math.random() * 360);
+        const dx = (Math.random() - 0.5) * 380;
+        const dy = -(120 + Math.random() * 420);
 
-        const size = 10 + Math.random() * 10;
+        const size = 10 + Math.random() * 12;
         h.style.width = size + "px";
         h.style.height = size + "px";
 
@@ -231,57 +232,62 @@
         h.style.top = y + "px";
         h.style.setProperty("--dx", dx + "px");
         h.style.setProperty("--dy", dy + "px");
-        h.style.animationDuration = (650 + Math.random() * 500) + "ms";
+        h.style.animationDuration = (650 + Math.random() * 650) + "ms";
         h.style.opacity = (0.7 + Math.random() * 0.3).toFixed(2);
 
         confettiLayer.appendChild(h);
-        setTimeout(() => h.remove(), 1400);
+        setTimeout(() => h.remove(), 1600);
       }
     }
 
     function popEmojis(x, y, count){
-      const emojis = ["💗", "🍆"]; // change/remove 🍆 anytime
+      const emojis = ["💗", "🍆"];
       for(let i=0;i<count;i++){
         const s = document.createElement("span");
         s.className = "confettiEmoji";
         s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
 
-        const dx = (Math.random() - 0.5) * 340;
-        const dy = -(120 + Math.random() * 360);
-        const rot = (Math.random() - 0.5) * 120 + "deg";
+        const dx = (Math.random() - 0.5) * 380;
+        const dy = -(120 + Math.random() * 420);
+        const rot = ((Math.random() - 0.5) * 140) + "deg";
 
         s.style.left = x + "px";
         s.style.top = y + "px";
         s.style.setProperty("--dx", dx + "px");
         s.style.setProperty("--dy", dy + "px");
         s.style.setProperty("--rot", rot);
-        s.style.fontSize = (16 + Math.random() * 14) + "px";
-        s.style.animationDuration = (650 + Math.random() * 650) + "ms";
+        s.style.fontSize = (18 + Math.random() * 16) + "px";
+        s.style.animationDuration = (650 + Math.random() * 800) + "ms";
         s.style.opacity = (0.75 + Math.random() * 0.25).toFixed(2);
 
         confettiLayer.appendChild(s);
-        setTimeout(() => s.remove(), 1500);
+        setTimeout(() => s.remove(), 1700);
       }
     }
 
-    // 5-second party mode (continuous)
+    // Continuous 5-second party spam (restarts on every click)
     let partyIntervalId = null;
+    let partyStopTimeoutId = null;
+
     function partyForFiveSeconds(x, y){
-      if(partyIntervalId) return;
+      if (partyIntervalId) clearInterval(partyIntervalId);
+      if (partyStopTimeoutId) clearTimeout(partyStopTimeoutId);
 
       const tick = () => {
-        const jitterX = x + (Math.random() - 0.5) * 160;
-        const jitterY = y + (Math.random() - 0.5) * 80;
-        popHearts(jitterX, jitterY, 10);
-        popEmojis(jitterX, jitterY, 6);
+        const jitterX = x + (Math.random() - 0.5) * 260;
+        const jitterY = y + (Math.random() - 0.5) * 140;
+
+        popHearts(jitterX, jitterY, 14);
+        popEmojis(jitterX, jitterY, 10);
       };
 
-      tick();
-      partyIntervalId = setInterval(tick, 170);
+      tick(); // instant
+      partyIntervalId = setInterval(tick, 120);
 
-      setTimeout(() => {
+      partyStopTimeoutId = setTimeout(() => {
         clearInterval(partyIntervalId);
         partyIntervalId = null;
+        partyStopTimeoutId = null;
       }, 5000);
     }
 
