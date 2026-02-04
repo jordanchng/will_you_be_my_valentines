@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Be my Valentine?</title>
   <style>
-    :root { color-scheme: light; }
     body{
       margin:0;
       min-height:100vh;
@@ -19,8 +18,8 @@
       padding:24px;
     }
     .card{
-      width:min(560px, 92vw);
-      background: rgba(255,255,255,0.75);
+      width:min(620px, 92vw);
+      background: rgba(255,255,255,0.78);
       border: 1px solid rgba(0,0,0,0.08);
       border-radius: 18px;
       padding: 22px 18px;
@@ -28,8 +27,8 @@
       backdrop-filter: blur(8px);
     }
     h1{ margin: 0 0 8px; font-size: 2rem; }
-    p{ margin: 0 0 18px; line-height: 1.45; }
-    .buttons{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+    p{ margin: 0 0 16px; line-height: 1.45; }
+    .buttons{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom: 10px; }
     button{
       border:0;
       border-radius:999px;
@@ -39,14 +38,18 @@
     }
     #yes{ background:#ff2f6d; color:#fff; }
     #no{ background:#fff; color:#ff2f6d; border:1px solid rgba(0,0,0,0.1); }
-    #msg{ display:none; margin-top:16px; font-weight:700; }
+
+    #afterYes { display:none; margin-top: 14px; }
+    #photo {
+      display:none;
+      width: min(520px, 88vw);
+      border-radius: 18px;
+      margin: 12px auto 0;
+      box-shadow: 0 14px 40px rgba(0,0,0,0.18);
+    }
   </style>
 </head>
 <body>
-  <div style="position:fixed;top:10px;left:10px;background:#fff;color:#111;padding:6px 10px;border-radius:10px;z-index:9999;font-weight:700">
-    VERSION 9:54PM
-  </div>
-
   <div class="card">
     <h1>Will you be my Valentine?</h1>
     <p>I like spending time with you. Want to make 14 Feb special together?</p>
@@ -56,20 +59,28 @@
       <button id="no">No 😅</button>
     </div>
 
-    <div id="msg">Yay!! 💘 Text me your free time and I’ll plan something nice.</div>
+    <div id="afterYes">
+      <div style="font-weight:800;">Yay!! 💘 It’s a date.</div>
+      <div style="margin-top:6px;">Tell me what time you’re free and I’ll plan something nice.</div>
+    </div>
+
+    <img id="photo" src="images/IMG_5365.jpg" alt="A photo of us together" />
   </div>
 
   <script>
     const yes = document.getElementById("yes");
     const no = document.getElementById("no");
-    const msg = document.getElementById("msg");
+    const afterYes = document.getElementById("afterYes");
+    const photo = document.getElementById("photo");
 
     yes.addEventListener("click", () => {
-      msg.style.display = "block";
+      afterYes.style.display = "block";
+      photo.style.display = "block";
       no.style.display = "none";
       yes.textContent = "Yay 💞";
     });
 
+    // make "No" dodge (optional)
     no.addEventListener("mouseover", () => {
       const x = (Math.random() - 0.5) * 240;
       const y = (Math.random() - 0.5) * 160;
