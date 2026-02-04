@@ -84,7 +84,7 @@
       box-shadow: 0 14px 40px rgba(0,0,0,0.18);
     }
 
-    /* Heart confetti overlay */
+    /* Particle overlay */
     #confettiLayer{
       position: fixed;
       inset: 0;
@@ -92,6 +92,8 @@
       overflow: hidden;
       z-index: 9999;
     }
+
+    /* Heart pieces (CSS heart) */
     .confettiHeart{
       position: absolute;
       width: 14px;
@@ -114,9 +116,24 @@
     .confettiHeart::before{ top:-50%; left:0; }
     .confettiHeart::after{ left:-50%; top:0; }
 
+    /* Emoji pieces (💗 + 🍆) */
+    .confettiEmoji{
+      position: absolute;
+      font-size: 18px;
+      line-height: 1;
+      transform: translate(0,0);
+      opacity: 1;
+      animation: floatEmoji 950ms ease-out forwards;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.12));
+    }
+
     @keyframes flyUp{
       0%   { transform: translate(0,0) rotate(45deg) scale(1); opacity: 1; }
       100% { transform: translate(var(--dx), var(--dy)) rotate(45deg) scale(0.9); opacity: 0; }
+    }
+    @keyframes floatEmoji{
+      0%   { transform: translate(0,0) rotate(0deg) scale(1); opacity: 1; }
+      100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(1.05); opacity: 0; }
     }
   </style>
 </head>
@@ -139,7 +156,7 @@
     <div class="choices" id="choices">
       <button class="choiceBtn" data-pick="Dinner 🍝">Dinner 🍝</button>
       <button class="choiceBtn" data-pick="Dessert 🍰">Dessert 🍰</button>
-      <button class="choiceBtn" data-pick="Both 😈" data-confetti="true">Both 😈</button>
+      <button class="choiceBtn" data-pick="Both 😈" data-party="true">Both 😈</button>
     </div>
 
     <div id="picked"></div>
@@ -157,7 +174,7 @@
     const confettiLayer = document.getElementById("confettiLayer");
 
     // STOPPP gets longer every time
-    let stopPCount = 2; // STOP + "PP" (first hover -> STOPPPP)
+    let stopPCount = 2;
     function makeStopLonger(){
       stopPCount += 1;
       no.textContent = "STOP" + "P".repeat(stopPCount) + " 😭";
@@ -173,9 +190,7 @@
       choices.style.display = "none";
       picked.style.display = "block";
       picked.textContent = "Wrong answer 😤 Try again.";
-      setTimeout(() => {
-        showChoices();
-      }, 900);
+      setTimeout(() => showChoices(), 900);
     }
 
     yes.addEventListener("click", () => {
@@ -187,7 +202,6 @@
       yes.textContent = "Yay 💞";
     });
 
-    // "No" dodges + STOPPP grows
     function dodgeNo(){
       makeStopLonger();
       const x = (Math.random() - 0.5) * 240;
@@ -197,8 +211,7 @@
     no.addEventListener("mouseover", dodgeNo);
     no.addEventListener("click", (e) => { e.preventDefault(); dodgeNo(); });
 
-    function popHeartConfetti(x, y){
-      const count = 22;
+    function popHearts(x, y, count){
       const colors = ["#ff2f6d", "#ff4d6d", "#ff5ea0", "#ff2f9a"];
       for(let i=0;i<count;i++){
         const h = document.createElement("div");
@@ -218,7 +231,7 @@
         h.style.top = y + "px";
         h.style.setProperty("--dx", dx + "px");
         h.style.setProperty("--dy", dy + "px");
-        h.style.animationDuration = (700 + Math.random() * 500) + "ms";
+        h.style.animationDuration = (650 + Math.random() * 500) + "ms";
         h.style.opacity = (0.7 + Math.random() * 0.3).toFixed(2);
 
         confettiLayer.appendChild(h);
@@ -226,11 +239,54 @@
       }
     }
 
-    // Choices behavior:
-    // Dinner/Dessert => wrong answer + reset
-    // Both => confetti + locked in
+    function popEmojis(x, y, count){
+      const emojis = ["💗", "🍆"]; // change/remove 🍆 anytime
+      for(let i=0;i<count;i++){
+        const s = document.createElement("span");
+        s.className = "confettiEmoji";
+        s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+        const dx = (Math.random() - 0.5) * 340;
+        const dy = -(120 + Math.random() * 360);
+        const rot = (Math.random() - 0.5) * 120 + "deg";
+
+        s.style.left = x + "px";
+        s.style.top = y + "px";
+        s.style.setProperty("--dx", dx + "px");
+        s.style.setProperty("--dy", dy + "px");
+        s.style.setProperty("--rot", rot);
+        s.style.fontSize = (16 + Math.random() * 14) + "px";
+        s.style.animationDuration = (650 + Math.random() * 650) + "ms";
+        s.style.opacity = (0.75 + Math.random() * 0.25).toFixed(2);
+
+        confettiLayer.appendChild(s);
+        setTimeout(() => s.remove(), 1500);
+      }
+    }
+
+    // 5-second party mode (continuous)
+    let partyIntervalId = null;
+    function partyForFiveSeconds(x, y){
+      if(partyIntervalId) return;
+
+      const tick = () => {
+        const jitterX = x + (Math.random() - 0.5) * 160;
+        const jitterY = y + (Math.random() - 0.5) * 80;
+        popHearts(jitterX, jitterY, 10);
+        popEmojis(jitterX, jitterY, 6);
+      };
+
+      tick();
+      partyIntervalId = setInterval(tick, 170);
+
+      setTimeout(() => {
+        clearInterval(partyIntervalId);
+        partyIntervalId = null;
+      }, 5000);
+    }
+
     document.querySelectorAll(".choiceBtn").forEach(btn => {
-      btn.addEventListener("click", (e) => {
+      btn.addEventListener("click", () => {
         const pick = btn.getAttribute("data-pick");
 
         if(pick === "Dinner 🍝" || pick === "Dessert 🍰"){
@@ -238,14 +294,13 @@
           return;
         }
 
-        // Both 😈
         picked.style.display = "block";
         picked.textContent = `Locked in: ${pick} 💘`;
 
         const rect = btn.getBoundingClientRect();
         const x = rect.left + rect.width / 2;
         const y = rect.top + rect.height / 2;
-        popHeartConfetti(x, y);
+        partyForFiveSeconds(x, y);
       });
     });
   </script>
