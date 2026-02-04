@@ -26,14 +26,26 @@
       box-shadow: 0 12px 40px rgba(0,0,0,0.12);
       backdrop-filter: blur(8px);
     }
-    h1{ margin: 0 0 14px; font-size: 2rem; }
-    .buttons{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom: 10px; }
+    h1{
+      margin: 0 0 14px;
+      font-size: clamp(1.45rem, 3.5vw, 2rem);
+      line-height: 1.15;
+    }
+    .buttons{
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-bottom: 10px;
+      position: relative;
+    }
     button{
       border:0;
       border-radius:999px;
       padding: 10px 18px;
       font-size: 1rem;
       cursor:pointer;
+      transition: transform 0.15s ease;
     }
     #yes{ background:#ff2f6d; color:#fff; }
     #no{ background:#fff; color:#ff2f6d; border:1px solid rgba(0,0,0,0.1); }
@@ -52,11 +64,11 @@
 </head>
 <body>
   <div class="card">
-    <h1>To the love of my life, will you be my Valentine?</h1>
+    <h1>To the love of my life, will you be my Valentines?</h1>
 
     <div class="buttons">
-      <button id="yes">Yes 💗</button>
-      <button id="no">No 😅</button>
+      <button id="yes">YASSSSSSS 😛😛💅💅</button>
+      <button id="no">hmm I’ll think about it 🤔 🤨</button>
     </div>
 
     <div id="afterYes">
@@ -68,4 +80,32 @@
   </div>
 
   <script>
-    const yes = document.getElementById("ye
+    const yes = document.getElementById("yes");
+    const no = document.getElementById("no");
+    const afterYes = document.getElementById("afterYes");
+    const photo = document.getElementById("photo");
+
+    yes.addEventListener("click", () => {
+      afterYes.style.display = "block";
+      photo.style.display = "block";
+      no.style.display = "none";
+      yes.textContent = "Yay 💞";
+    });
+
+    // Dodge "hmm i'll think about it"
+    no.addEventListener("mouseover", () => {
+      const x = (Math.random() - 0.5) * 240;
+      const y = (Math.random() - 0.5) * 160;
+      no.style.transform = `translate(${x}px, ${y}px)`;
+    });
+
+    // Also dodge on click (helps on phones)
+    no.addEventListener("click", (e) => {
+      e.preventDefault();
+      const x = (Math.random() - 0.5) * 240;
+      const y = (Math.random() - 0.5) * 160;
+      no.style.transform = `translate(${x}px, ${y}px)`;
+    });
+  </script>
+</body>
+</html>
