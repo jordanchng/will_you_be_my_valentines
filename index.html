@@ -18,7 +18,7 @@
       padding:24px;
     }
     .card{
-      width:min(620px, 92vw);
+      width:min(680px, 92vw);
       background: rgba(255,255,255,0.78);
       border: 1px solid rgba(0,0,0,0.08);
       border-radius: 18px;
@@ -42,11 +42,13 @@
     #afterYes { display:none; margin-top: 14px; }
     #photo {
       display:none;
-      width: min(520px, 88vw);
+      width: min(560px, 88vw);
       border-radius: 18px;
       margin: 12px auto 0;
       box-shadow: 0 14px 40px rgba(0,0,0,0.18);
     }
+    #msgTitle { font-weight: 850; font-size: 1.2rem; }
+    #msgText { margin-top: 6px; }
   </style>
 </head>
 <body>
@@ -60,11 +62,11 @@
     </div>
 
     <div id="afterYes">
-      <div style="font-weight:800;">Yay!! 💘 It’s a date.</div>
-      <div style="margin-top:6px;">Tell me what time you’re free and I’ll plan something nice.</div>
+      <div id="msgTitle">Yay!! 💘 It’s a date.</div>
+      <div id="msgText">Tell me what time you’re free and I’ll plan something nice.</div>
     </div>
 
-    <img id="photo" src="images/IMG_5365.jpg" alt="A photo of us together" />
+    <img id="photo" src="IMG_5365.JPEG" alt="Our photo together" />
   </div>
 
   <script>
@@ -80,7 +82,6 @@
       yes.textContent = "Yay 💞";
     });
 
-    // make "No" dodge (optional)
     no.addEventListener("mouseover", () => {
       const x = (Math.random() - 0.5) * 240;
       const y = (Math.random() - 0.5) * 160;
