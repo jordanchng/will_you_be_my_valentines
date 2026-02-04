@@ -26,8 +26,7 @@
       box-shadow: 0 12px 40px rgba(0,0,0,0.12);
       backdrop-filter: blur(8px);
     }
-    h1{ margin: 0 0 8px; font-size: 2rem; }
-    p{ margin: 0 0 16px; line-height: 1.45; }
+    h1{ margin: 0 0 14px; font-size: 2rem; }
     .buttons{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom: 10px; }
     button{
       border:0;
@@ -47,14 +46,13 @@
       margin: 12px auto 0;
       box-shadow: 0 14px 40px rgba(0,0,0,0.18);
     }
-    #msgTitle { font-weight: 850; font-size: 1.2rem; }
+    #msgTitle { font-weight: 900; font-size: 1.25rem; }
     #msgText { margin-top: 6px; }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>Will you be my Valentine?</h1>
-    <p>I like spending time with you. Want to make 14 Feb special together?</p>
+    <h1>To the love of my life, will you be my Valentine?</h1>
 
     <div class="buttons">
       <button id="yes">Yes 💗</button>
@@ -62,31 +60,12 @@
     </div>
 
     <div id="afterYes">
-      <div id="msgTitle">Yay!! 💘 It’s a date.</div>
-      <div id="msgText">Tell me what time you’re free and I’ll plan something nice.</div>
+      <div id="msgTitle">Yayyyyy 💗 You’re stuck with me now.</div>
+      <div id="msgText">Your job: just show up and look cute.</div>
     </div>
 
     <img id="photo" src="IMG_5365.JPEG" alt="Our photo together" />
   </div>
 
   <script>
-    const yes = document.getElementById("yes");
-    const no = document.getElementById("no");
-    const afterYes = document.getElementById("afterYes");
-    const photo = document.getElementById("photo");
-
-    yes.addEventListener("click", () => {
-      afterYes.style.display = "block";
-      photo.style.display = "block";
-      no.style.display = "none";
-      yes.textContent = "Yay 💞";
-    });
-
-    no.addEventListener("mouseover", () => {
-      const x = (Math.random() - 0.5) * 240;
-      const y = (Math.random() - 0.5) * 160;
-      no.style.transform = `translate(${x}px, ${y}px)`;
-    });
-  </script>
-</body>
-</html>
+    const yes = document.getElementById("ye
