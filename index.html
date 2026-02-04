@@ -18,13 +18,14 @@
       padding:24px;
     }
     .card{
-      width:min(680px, 92vw);
+      width:min(760px, 92vw);
       background: rgba(255,255,255,0.78);
       border: 1px solid rgba(0,0,0,0.08);
       border-radius: 18px;
       padding: 22px 18px;
       box-shadow: 0 12px 40px rgba(0,0,0,0.12);
       backdrop-filter: blur(8px);
+      position: relative;
     }
     h1{
       margin: 0 0 14px;
@@ -46,11 +47,35 @@
       font-size: 1rem;
       cursor:pointer;
       transition: transform 0.15s ease;
+      user-select: none;
     }
     #yes{ background:#ff2f6d; color:#fff; }
     #no{ background:#fff; color:#ff2f6d; border:1px solid rgba(0,0,0,0.1); }
 
     #afterYes { display:none; margin-top: 14px; }
+    #msgTitle { font-weight: 900; font-size: 1.25rem; }
+    #msgText { margin-top: 6px; }
+
+    .choices{
+      display:none;
+      margin-top: 12px;
+      gap:10px;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+    .choiceBtn{
+      background:#fff;
+      border:1px solid rgba(0,0,0,0.1);
+      color:#1b1020;
+    }
+    .choiceBtn:hover{ transform: translateY(-1px); }
+
+    #picked{
+      display:none;
+      margin-top: 10px;
+      font-weight: 800;
+    }
+
     #photo {
       display:none;
       width: min(560px, 88vw);
@@ -58,13 +83,48 @@
       margin: 12px auto 0;
       box-shadow: 0 14px 40px rgba(0,0,0,0.18);
     }
-    #msgTitle { font-weight: 900; font-size: 1.25rem; }
-    #msgText { margin-top: 6px; }
+
+    /* Heart confetti overlay */
+    #confettiLayer{
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 9999;
+    }
+    .confettiHeart{
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: var(--c, #ff2f6d);
+      transform: rotate(45deg);
+      opacity: 0.95;
+      animation: flyUp 900ms ease-out forwards;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.15));
+    }
+    .confettiHeart::before,
+    .confettiHeart::after{
+      content:"";
+      position:absolute;
+      width:100%;
+      height:100%;
+      background: var(--c, #ff2f6d);
+      border-radius:50%;
+    }
+    .confettiHeart::before{ top:-50%; left:0; }
+    .confettiHeart::after{ left:-50%; top:0; }
+
+    @keyframes flyUp{
+      0%   { transform: translate(0,0) rotate(45deg) scale(1); opacity: 1; }
+      100% { transform: translate(var(--dx), var(--dy)) rotate(45deg) scale(0.9); opacity: 0; }
+    }
   </style>
 </head>
 <body>
+  <div id="confettiLayer"></div>
+
   <div class="card">
-    <h1>To the love of my life, will you be my Valentines?</h1>
+    <h1>To the love of my life, will you be my Valentine?</h1>
 
     <div class="buttons">
       <button id="yes">YASSSSSSS 😛😛💅💅</button>
@@ -76,6 +136,14 @@
       <div id="msgText">Your job: just show up and look cute.</div>
     </div>
 
+    <div class="choices" id="choices">
+      <button class="choiceBtn" data-pick="Dinner 🍝">Dinner 🍝</button>
+      <button class="choiceBtn" data-pick="Dessert 🍰">Dessert 🍰</button>
+      <button class="choiceBtn" data-pick="Both 😈" data-confetti="true">Both 😈</button>
+    </div>
+
+    <div id="picked"></div>
+
     <img id="photo" src="IMG_5365.JPEG" alt="Our photo together" />
   </div>
 
@@ -84,27 +152,101 @@
     const no = document.getElementById("no");
     const afterYes = document.getElementById("afterYes");
     const photo = document.getElementById("photo");
+    const choices = document.getElementById("choices");
+    const picked = document.getElementById("picked");
+    const confettiLayer = document.getElementById("confettiLayer");
+
+    // STOPPP gets longer every time
+    let stopPCount = 2; // STOP + "PP" (first hover -> STOPPPP)
+    function makeStopLonger(){
+      stopPCount += 1;
+      no.textContent = "STOP" + "P".repeat(stopPCount) + " 😭";
+    }
+
+    function showChoices(){
+      choices.style.display = "flex";
+      picked.style.display = "none";
+      picked.textContent = "";
+    }
+
+    function wrongAnswer(){
+      choices.style.display = "none";
+      picked.style.display = "block";
+      picked.textContent = "Wrong answer 😤 Try again.";
+      setTimeout(() => {
+        showChoices();
+      }, 900);
+    }
 
     yes.addEventListener("click", () => {
       afterYes.style.display = "block";
       photo.style.display = "block";
+      showChoices();
+
       no.style.display = "none";
       yes.textContent = "Yay 💞";
     });
 
-    // Dodge "hmm i'll think about it"
-    no.addEventListener("mouseover", () => {
+    // "No" dodges + STOPPP grows
+    function dodgeNo(){
+      makeStopLonger();
       const x = (Math.random() - 0.5) * 240;
       const y = (Math.random() - 0.5) * 160;
       no.style.transform = `translate(${x}px, ${y}px)`;
-    });
+    }
+    no.addEventListener("mouseover", dodgeNo);
+    no.addEventListener("click", (e) => { e.preventDefault(); dodgeNo(); });
 
-    // Also dodge on click (helps on phones)
-    no.addEventListener("click", (e) => {
-      e.preventDefault();
-      const x = (Math.random() - 0.5) * 240;
-      const y = (Math.random() - 0.5) * 160;
-      no.style.transform = `translate(${x}px, ${y}px)`;
+    function popHeartConfetti(x, y){
+      const count = 22;
+      const colors = ["#ff2f6d", "#ff4d6d", "#ff5ea0", "#ff2f9a"];
+      for(let i=0;i<count;i++){
+        const h = document.createElement("div");
+        h.className = "confettiHeart";
+
+        const dx = (Math.random() - 0.5) * 360;
+        const dy = -(120 + Math.random() * 360);
+
+        const size = 10 + Math.random() * 10;
+        h.style.width = size + "px";
+        h.style.height = size + "px";
+
+        const c = colors[Math.floor(Math.random() * colors.length)];
+        h.style.setProperty("--c", c);
+
+        h.style.left = x + "px";
+        h.style.top = y + "px";
+        h.style.setProperty("--dx", dx + "px");
+        h.style.setProperty("--dy", dy + "px");
+        h.style.animationDuration = (700 + Math.random() * 500) + "ms";
+        h.style.opacity = (0.7 + Math.random() * 0.3).toFixed(2);
+
+        confettiLayer.appendChild(h);
+        setTimeout(() => h.remove(), 1400);
+      }
+    }
+
+    // Choices behavior:
+    // Dinner/Dessert => wrong answer + reset
+    // Both => confetti + locked in
+    document.querySelectorAll(".choiceBtn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const pick = btn.getAttribute("data-pick");
+
+        if(pick === "Dinner 🍝" || pick === "Dessert 🍰"){
+          wrongAnswer();
+          return;
+        }
+
+        // Both 😈
+        picked.style.display = "block";
+        picked.textContent = `Locked in: ${pick} 💘`;
+
+        const rect = btn.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+        popHeartConfetti(x, y);
+      });
     });
   </script>
 </body>
